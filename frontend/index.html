@@ -1,1 +1,101 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Zync</title>
+</head>
+<body>
+    <noscript>this page only works with js, sorry</noscript>
+    <div class="flex flex-col" x-data="{visible: false, selectedLanguage: null}">
+        <span class="absolute fixed bottom-10 right-10 bg-green-300 w-13 h-13 flex items-center justify-center rounded-lg hover:bg-green-400 hover:cursor-pointer" @click="visible = ! visible">
+            +
+        </span>
+        <div class="self-center justify-self-center fixed inset-0 bg-white rounded-md shadow-2xl w-3/5 h-2/3 flex flex-col items-center justify-center" x-show="visible" x-transition>
+            <div class="self-end m-4 hover:cursor-pointer" @click="visible = ! visible">X</div>
+            <p class="font-bold">Language</p>
+            <div class="bg-white rounded-md shadow-xl w-1/2 m-2 flex justify-center space-x-1">
+                <div 
+                    class="w-16 h-16 rounded-lg flex items-center justify-center hover:bg-gray-300 hover:cursor-pointer" 
+                    :class="selectedLanguage === 'Python' ? 'bg-gray-300' : 'bg-white'"
+                    @click="selectedLanguage = 'Python'"
+                    aria-label="Python" 
+                    title="Python"
+                >
+                    <i class="fab fa-python"></i>
+                </div>
+                <div 
+                    class="w-16 h-16 rounded-lg flex items-center justify-center hover:bg-gray-300 hover:cursor-pointer" 
+                    :class="selectedLanguage === 'JavaScript' ? 'bg-gray-300' : 'bg-white'"
+                    @click="selectedLanguage = 'JavaScript'"
+                    aria-label="JavaScript" 
+                    title="JavaScript"
+                >
+                    <i class="fab fa-js-square"></i>
+                </div>
+                <div 
+                    class="w-16 h-16 rounded-lg flex items-center justify-center hover:bg-gray-300 hover:cursor-pointer" 
+                    :class="selectedLanguage === 'Go' ? 'bg-gray-300' : 'bg-white'"
+                    @click="selectedLanguage = 'Go'"
+                    aria-label="Go" 
+                    title="Go"
+                >
+                    <i class="fab fa-golang"></i>
+                </div>
+            </div>
+            <p class="font-bold mt-4">Runtime</p>
+            <div x-data="{ selectedRuntime: null }" @watch("selectedLanguage", "selectedRuntime = null") class="bg-white rounded-md shadow-xl w-1/2 m-2 flex justify-center space-x-1">
+                <div
+                    class="w-16 h-16 rounded-lg flex items-center justify-center transition cursor-pointer"
+                    :class="{
+                        'bg-white': selectedRuntime !== 'Node.js' && selectedLanguage !== 'JavaScript',
+                        'bg-gray-300': selectedRuntime === 'Node.js',
+                        'hover:bg-gray-300': selectedRuntime !== 'Node.js' && selectedLanguage === 'JavaScript',
+                        'opacity-50 cursor-not-allowed bg-white': selectedLanguage !== 'JavaScript'
+                    }"
+                    @click="if (selectedLanguage === 'JavaScript') selectedRuntime = 'Node.js'"
+                    aria-label="Node.js" 
+                    title="Node.js"
+                >
+                    <i class="fab fa-node-js"></i>
+                </div>
+                <div 
+                    class="w-16 h-16 rounded-lg flex items-center justify-center transition cursor-pointer"
+                    :class="{
+                        'bg-white': selectedRuntime !== 'Bun' && selectedLanguage !== 'JavaScript',
+                        'bg-gray-300': selectedRuntime === 'Bun',
+                        'hover:bg-gray-300': selectedRuntime !== 'Bun' && selectedLanguage === 'JavaScript',
+                        'opacity-50 cursor-not-allowed bg-white': selectedLanguage !== 'JavaScript'
+                    }"
+                    @click="if (selectedLanguage === 'JavaScript') selectedRuntime = 'Bun'"
+                    aria-label="Bun" 
+                    title="Bun"
+                >
+                    <i class="fa-solid fa-bread-slice"></i>
+                </div>
+                <div 
+                    class="w-16 h-16 rounded-lg flex items-center justify-center transition cursor-pointer"
+                    :class="{
+                        'bg-white': selectedRuntime !== 'Yarn' && selectedLanguage !== 'JavaScript',
+                        'bg-gray-300': selectedRuntime === 'Yarn',
+                        'hover:bg-gray-300': selectedRuntime !== 'Yarn' && selectedLanguage === 'JavaScript',
+                        'opacity-50 cursor-not-allowed bg-white': selectedLanguage !== 'JavaScript'
+                    }"
+                    @click="if (selectedLanguage === 'JavaScript') selectedRuntime = 'Yarn'"
+                    aria-label="Yarn" 
+                    title="Yarn"
+                >
+                    <i class="fab fa-yarn"></i>
+                </div>
+            </div>
+            <div class="m-2 p-2 w-1/2 bg-green-300 hover:bg-green-400 hover:cursor-pointer text-center justify-text-center">
+                Create Container <i class="fa-solid fa-paper-airplane"></i>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
