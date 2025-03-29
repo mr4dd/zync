@@ -8,14 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Zync</title>
 </head>
-<body>
+<body  x-data="{ selectedRuntime: null, selectedLanguage: null, items: [] }">
     <noscript>this page only works with js, sorry</noscript>
-    <div class="flex flex-col" x-data="{visible: false, selectedLanguage: null}">
-        <span class="absolute fixed bottom-10 right-10 bg-green-300 w-13 h-13 flex items-center justify-center rounded-lg hover:bg-green-400 hover:cursor-pointer" @click="visible = ! visible">
-            +
+    <div class="flex flex-col" x-data="{visible: false}">
+        <span class="z-9999 absolute fixed bottom-10 right-10 bg-green-300 w-13 h-13 flex items-center justify-center rounded-lg hover:bg-green-400 hover:cursor-pointer" @click="visible = ! visible">
+            <i class="fa-solid fa-plus"></i>
         </span>
         <div class="self-center justify-self-center fixed inset-0 bg-white rounded-md shadow-2xl w-3/5 h-2/3 flex flex-col items-center justify-center" x-show="visible" x-transition>
-            <div class="self-end m-4 hover:cursor-pointer" @click="visible = ! visible">X</div>
+            <div class="self-end m-4 hover:cursor-pointer" @click="visible = ! visible">
+                <i class="fa-solid fa-x"></i>
+            </div>
             <p class="font-bold">Language</p>
             <div class="bg-white rounded-md shadow-xl w-1/2 m-2 flex justify-center space-x-1">
                 <div 
@@ -47,7 +49,7 @@
                 </div>
             </div>
             <p class="font-bold mt-4">Runtime</p>
-            <div x-data="{ selectedRuntime: null }" @watch("selectedLanguage", "selectedRuntime = null") class="bg-white rounded-md shadow-xl w-1/2 m-2 flex justify-center space-x-1">
+            <div x-effect='if (selectedLanguage != "JavaScript") selectedRuntime = null' class="bg-white rounded-md shadow-xl w-1/2 m-2 flex justify-center space-x-1">
                 <div
                     class="w-16 h-16 rounded-lg flex items-center justify-center transition cursor-pointer"
                     :class="{
@@ -91,11 +93,51 @@
                     <i class="fab fa-yarn"></i>
                 </div>
             </div>
-            <div class="m-2 p-2 w-1/2 bg-green-300 hover:bg-green-400 hover:cursor-pointer text-center justify-text-center">
-                Create Container <i class="fa-solid fa-paper-airplane"></i>
+            <div class="m-2 p-2 w-1/2 bg-green-300 hover:bg-green-400 hover:cursor-pointer text-center justify-text-center"
+                 @click="fetch('/new', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({'lang': selectedLanguage, 'runtime': selectedRuntime})
+                 })
+                 .then(data => data.json())
+                 .then((json) => items.push(...json))"
+            >
+                Create Container <i class="fa-solid fa-paper-plane"></i>
             </div>
         </div>
         
     </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 m-5">
+        <template x-for="item in items">
+            <div class="bg-white min-h-48 rounded-lg shadow-2xl flex flex-col relative p-4">
+                <i class="fa-solid fa-box text-6xl absolute top-0 left-0 m-2 rounded-full"></i>
+                <p x-text="item.ID" class="font-bold font-mono uppercase text-xl text-center cursor-pointer hover:bg-gray-100 p-2 rounded-md" @click="navigator.clipboard.writeText(item.ID)"></p>
+                <i class="fa-solid fa-trash text-3xl absolute bottom-0 right-0 m-2 cursor-pointer hover:bg-gray-100 hover:text-red-500 p-2 rounded-full" 
+                   @click="fetch('/delete', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({'ID': item.ID})
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.status === 'deleted') {
+                      console.log('Item deleted successfully');
+                    }
+                  })
+                  .catch(error => {
+                    if (error.response && error.response.status === 500) {
+                      console.log('error');
+                    }
+                  }); // add actual nice UI later
+                  "></i>
+            </div>        
+        </template>
+    </div>
+    <!--temporary for now just so i remember, move behind some sort of account settings page later so its not just out in the open-->
+    <p class="z-9999 absolute bottom-2 left-2 bg-white hover:bg-gray-300 hover:cursor-pointer" x-text="localStorage.getItem('jwt')" @click="navigator.clipboard.writeText(localStorage.getItem('jwt'))"></p>
 </body>
 </html>
