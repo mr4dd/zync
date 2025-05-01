@@ -21,10 +21,10 @@ import (
 )
 
 // not final
-type Json struct {
+type Body struct {
     ID string
-    Lang int 
-    Runner int 
+    Lang string
+    Runner string
     token string
 }
 
@@ -53,7 +53,37 @@ func Root(w http.ResponseWriter, r *http.Request){
 func New(w http.ResponseWriter, r *http.Request){
     if (r.Method == "POST"){
         // Image will be user chosen and matched against array of valid images 
-        _, err = images.Pull(conn, "quay.io/libpod/alpine_nginx", nil)
+        var body Body;
+        
+        err = json.Decoder(r.body).decode(&body)
+        if err != nil {
+            w.WriteHeader(HTTP.StatusBadRequest)
+            w.Write("invalid request body")
+        }
+        
+        if (body.Lang == "Javascript") {
+            switch body.Runner {
+            case "Node.js":
+                // placeholder
+            case "Yarn":
+                // placeholder
+            case "Bun":
+                // placeholder
+            case default:
+                w.WriteHeader(HTTP.StatusBadRequest) 
+                w.Write("Unsupported runner or language selected")
+            }
+        } else if (body.Lang == "Python"){
+            // placeholder
+        } else if (body.Lang == "Go") {
+            // placeholder
+        } else {
+            w.WriteHeader(HTTP.StatusBadRequest)
+            w.Write("Unsupported runner or language selected")
+        }
+
+        // new container creation code will be added later when i make custom ones that run my custom syncing code (or whatever i decide on) that way we're not pulling from quay and instead using local containers 
+        // _, err = images.Pull(conn, "quay.io/libpod/alpine_nginx", nil)
         
         if err != nil {
             fmt.Println(err)
@@ -82,7 +112,7 @@ func New(w http.ResponseWriter, r *http.Request){
         // the container ID
         ID := inspectData.ID
 
-        w.Write({"status":"started", "id": ID})
+        w.Write(json.Marshal({"status":"started", "id": ID}))
     } else {
         w.WriteHeader(http.StatusMethodNotAllowed)
     }
@@ -111,7 +141,7 @@ func Delete(w http.ResponseWriter, r *http.Request, conn *bindings.Connection){
                 fmt.Println(err)
                 w.WriteHeader(http.StatusInternalServerError)
             } else {
-                w.Write({"status":"deleted"})
+                w.Write(json.Marshal({"status":"deleted"}))
             }
         }
     
